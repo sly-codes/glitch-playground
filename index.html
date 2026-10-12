@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Glitch/Playground</title>
+    <meta name="description" content="Turn ordinary images into digital glitch art, entirely in your browser." />
+    <meta name="theme-color" content="#0a0b0a" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__brand">
+        <h1 class="wordmark">GLITCH<span>/</span>PLAYGROUND</h1>
+        <p class="status" title="Images are processed on this device and never uploaded">
+          <i aria-hidden="true"></i>LOCAL MODE
+        </p>
+      </div>
+      <div class="header__actions">
+        <button class="btn" type="button" data-action="reset" title="Restore all effect settings to their defaults">
+          Reset
+        </button>
+        <button
+          class="btn btn--accent"
+          type="button"
+          id="export"
+          title="Download the processed image as a PNG"
+          disabled
+        >
+          Export PNG
+        </button>
+      </div>
+    </header>
+
+    <main class="app">
+      <section class="workspace" aria-label="Canvas">
+        <div class="stage" id="stage">
+          <span class="stage__mark stage__mark--tl" aria-hidden="true"></span>
+          <span class="stage__mark stage__mark--tr" aria-hidden="true"></span>
+          <span class="stage__mark stage__mark--bl" aria-hidden="true"></span>
+          <span class="stage__mark stage__mark--br" aria-hidden="true"></span>
+
+          <div class="empty" id="empty">
+            <div class="empty__art" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <h2>Drop an image to corrupt it</h2>
+            <p>PNG, JPEG, WebP, GIF or AVIF. You can also paste one. Nothing leaves this device.</p>
+            <div class="empty__actions">
+              <button class="btn btn--accent" type="button" data-action="pick">Select image</button>
+              <button class="btn btn--ghost" type="button" data-action="sample">Generate a test pattern</button>
+            </div>
+          </div>
+
+          <canvas class="output" id="output" hidden aria-label="Processed image preview"></canvas>
+
+          <div class="stage__drop" aria-hidden="true">Release to load</div>
+          <div class="stage__busy" id="busy" role="status" hidden></div>
+        </div>
+
+        <div class="readout" id="readout" hidden>
+          <span class="readout__name" id="r-name"></span>
+          <span id="r-size" title="Size of the exported image"></span>
+          <span id="r-state"></span>
+          <span id="r-time" title="Time to render the preview"></span>
+          <span class="readout__tools">
+            <button class="chip" type="button" data-action="reseed" title="New glitch pattern, same settings">
+              Seed <b id="r-seed"></b>
+            </button>
+            <button class="chip" type="button" id="compare" title="Hold to see the original image">
+              Hold to compare
+            </button>
+            <button class="chip" type="button" data-action="pick" title="Load another image">Replace image</button>
+          </span>
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="Effect controls">
+        <div class="panel__title">
+          <h2>Effects</h2>
+          <span>05 parameters</span>
+        </div>
+
+        <section class="ctl">
+          <div class="ctl__head">
+            <label for="intensity"><span>01</span>Glitch intensity</label>
+            <output for="intensity" id="intensity-out">0</output>
+          </div>
+          <input type="range" id="intensity" min="0" max="100" step="1" />
+          <p class="ctl__hint">Overall strength. Scales every effect below.</p>
+        </section>
+
+        <section class="ctl" data-effect="rgb">
+          <div class="ctl__head">
+            <label for="rgb"><span>02</span>RGB separation</label>
+            <output for="rgb" id="rgb-out">0</output>
+            <label class="switch" title="Enable or disable RGB separation">
+              <input type="checkbox" role="switch" id="rgb-on" aria-label="Enable RGB separation" />
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
+          <input type="range" id="rgb" min="0" max="50" step="1" />
+          <p class="ctl__hint">Pulls the red and blue channels apart.</p>
+        </section>
+
+        <section class="ctl" data-effect="displacement">
+          <div class="ctl__head">
+            <label for="displacement"><span>03</span>Horizontal displacement</label>
+            <output for="displacement" id="displacement-out">0</output>
+            <label class="switch" title="Enable or disable horizontal displacement">
+              <input type="checkbox" role="switch" id="displacement-on" aria-label="Enable horizontal displacement" />
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
+          <input type="range" id="displacement" min="0" max="100" step="1" />
+          <p class="ctl__hint">Shifts bands of the image sideways.</p>
+        </section>
+
+        <section class="ctl" data-effect="noise">
+          <div class="ctl__head">
+            <label for="noise"><span>04</span>Digital noise</label>
+            <output for="noise" id="noise-out">0</output>
+            <label class="switch" title="Enable or disable digital noise">
+              <input type="checkbox" role="switch" id="noise-on" aria-label="Enable digital noise" />
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
+          <input type="range" id="noise" min="0" max="100" step="1" />
+          <p class="ctl__hint">Grain, dead pixels, scanlines and corrupted blocks.</p>
+        </section>
+
+        <section class="ctl">
+          <div class="ctl__head">
+            <label for="frequency"><span>05</span>Glitch frequency</label>
+            <output for="frequency" id="frequency-out">0</output>
+          </div>
+          <input type="range" id="frequency" min="0" max="100" step="1" />
+          <p class="ctl__hint">How many bands and artifacts appear.</p>
+        </section>
+
+        <div class="panel__actions">
+          <button
+            class="btn btn--outline"
+            type="button"
+            data-action="randomize"
+            title="New random settings and pattern. The image is not changed."
+          >
+            Randomize
+          </button>
+          <button class="btn" type="button" data-action="reset" title="Restore all effect settings to their defaults">
+            Reset effects
+          </button>
+        </div>
+
+        <p class="panel__note">Effects are always computed from the original image, so nothing degrades as you experiment.</p>
+      </aside>
+    </main>
+
+    <input type="file" id="file" accept="image/*" hidden />
+    <div class="toast" id="toast" role="alert" hidden></div>
+  </body>
+</html>
