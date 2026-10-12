@@ -107,3 +107,7 @@ A few details behind the diagram:
 ## Credits
 
 Made by [Kone Issa](https://issa.nocerv.com).
+
+## License
+
+[MIT](LICENSE) © 2026 Kone Issa
