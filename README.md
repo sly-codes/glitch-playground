@@ -1,5 +1,8 @@
 # Glitch/Playground
 
+![AI Generated](https://img.shields.io/badge/AI--GENERATED-Claude-8A63D2)
+![Just for Fun](https://img.shields.io/badge/PROJECT-JUST_FOR_FUN-2EA44F)
+
 Turn ordinary images into digital glitch art, directly in the browser.
 
 Built with plain HTML, CSS, JavaScript and the Canvas API. No framework, no build step, no server: images never leave your device.
